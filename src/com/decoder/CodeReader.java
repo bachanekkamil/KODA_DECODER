@@ -26,6 +26,10 @@ public class CodeReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		for(byte baajt : bytes)	
+		System.out.printf("0x%02X", baajt);
+		
 	}
 	
 	public byte[] getBytes(){
