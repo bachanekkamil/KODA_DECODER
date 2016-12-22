@@ -26,7 +26,7 @@ public class App {
 		m.put(2, "lodzi");
 		
 		Interpreter intepreter = new Interpreter(m);
-		System.out.println("Zdekodowano:");		
+		System.out.println("Zdekodowano:");
 		intepreter.decode(bytes);
 	}
 }
