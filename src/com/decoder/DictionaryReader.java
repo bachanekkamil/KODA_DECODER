@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.decoder.App.STATE;
 
 public class DictionaryReader {
+	private enum STATE {NOTHING, CODE, CHAR};
 	private Map m;
 	private int minBin;
 	private int maxBin;
