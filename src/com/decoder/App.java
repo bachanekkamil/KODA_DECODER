@@ -26,11 +26,7 @@ public class App {
 		m.put(6, "dupe");
 		m.put(2, "lodzi");
 		
-		Interpreter intepreter = new Interpreter();
-		intepreter.decode(bytes, m);
+		Interpreter intepreter = new Interpreter(m);
+		intepreter.decode(bytes);
 	}
 }
-
-//111
-//110
-//10
