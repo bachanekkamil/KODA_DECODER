@@ -29,6 +29,7 @@ public class CodeReader {
 
 		for(byte baajt : bytes)	
 		System.out.printf("0x%02X", baajt);
+		System.out.println("");
 		
 	}
 	

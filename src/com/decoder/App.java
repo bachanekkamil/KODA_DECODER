@@ -11,7 +11,6 @@ public class App {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		System.out.println("Zdekodowano:");		
 		String codeFileName = "/home/koda/gen-bin2";		
 		String dicFileName = "/home/koda/gen-bin2-dic";	
 		/*/
@@ -27,6 +26,7 @@ public class App {
 		m.put(2, "lodzi");
 		
 		Interpreter intepreter = new Interpreter(m);
+		System.out.println("Zdekodowano:");		
 		intepreter.decode(bytes);
 	}
 }
