@@ -15,33 +15,18 @@ public class CodeReader {
 		try {
 			pathCodeFile = Paths.get(new URI("file:///" + filePath));
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+			
 		try {
 			bytes = Files.readAllBytes(pathCodeFile);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-		int ii = 0;
-		for(byte baajt : bytes)	
-		{
-			ii++;
-			if(ii < 100){
-			System.out.printf("0x%02X", baajt);
-			System.out.println("");
-			}
-		}
-		
+		}		
 	}
 	
 	public byte[] getBytes(){
 		return bytes;
 	}
 	
-
 }

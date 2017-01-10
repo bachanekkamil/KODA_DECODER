@@ -11,31 +11,40 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 
 public class DictionaryReader {
 	
 	private enum STATE {NOTHING, CODE, CHAR, LENGTH, ZERO_NAME, ZEROS};
-	private Map m;
+	private Map<Code, String> m;
 	private int zeros;
-	private int minBin;
-	private int maxBin;
+	private int minBin = Integer.MAX_VALUE;
 	
 	DictionaryReader(String filePath){
-		Reader buffer = createBuffer(filePath);
+		InputStream in = null;
+		Reader buffer = null;
+		try {
+			in = new FileInputStream(filePath);
+			Reader reader = new InputStreamReader(in, Charset.defaultCharset());
+			buffer = new BufferedReader(reader);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		createMap(buffer);
+		try {
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public Map getMap(){
+	public Map<Code, String> getMap(){
 		return m;
 	}
 	
 	public int getMinBin(){
 		return minBin;
-	}
-	
-	public int getMaxBin(){
-		return maxBin;
 	}
 	
 	public int getZeros(){
@@ -44,25 +53,25 @@ public class DictionaryReader {
 	
 	public void printDictionary(){
 		System.out.println("Zeros: " + zeros);
-		Iterator it = m.entrySet().iterator();
+		Iterator<Entry<Code, String>> it = m.entrySet().iterator();
 		while(it.hasNext()){
+			@SuppressWarnings("rawtypes")
 			Map.Entry pair = (Map.Entry) it.next();
 			Code x = (Code) pair.getKey();
 			System.out.println("Kod: " + x.code + " Length: " + x.length + " Symbol: " + pair.getValue());
 		}
 	}
 	
-	private Reader createBuffer(String filePath) {
-		Reader buffer = null;
-		try {
-			InputStream in = new FileInputStream(filePath);
-			Reader reader = new InputStreamReader(in, Charset.defaultCharset());
-			buffer = new BufferedReader(reader);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private void checkMin()
+	{
+		Iterator<Entry<Code, String>> it = m.entrySet().iterator();
+		while(it.hasNext()){
+			@SuppressWarnings("rawtypes")
+			Map.Entry pair = (Map.Entry) it.next();
+			Code x = (Code) pair.getKey();
+			if(x.length < minBin)
+				minBin = x.length;
 		}
-		return buffer;
 	}
 	
 	private void createMap(Reader buffer){
@@ -121,9 +130,9 @@ public class DictionaryReader {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		checkMin();
 	}
 	
 }
