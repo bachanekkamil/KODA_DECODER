@@ -27,9 +27,15 @@ public class CodeReader {
 			e.printStackTrace();
 		}
 
+		int ii = 0;
 		for(byte baajt : bytes)	
-		System.out.printf("0x%02X", baajt);
-		System.out.println("");
+		{
+			ii++;
+			if(ii < 100){
+			System.out.printf("0x%02X", baajt);
+			System.out.println("");
+			}
+		}
 		
 	}
 	

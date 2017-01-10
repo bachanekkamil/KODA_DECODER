@@ -14,8 +14,10 @@ import java.util.Map;
 
 
 public class DictionaryReader {
-	private enum STATE {NOTHING, CODE, CHAR};
+	
+	private enum STATE {NOTHING, CODE, CHAR, LENGTH, ZERO_NAME, ZEROS};
 	private Map m;
+	private int zeros;
 	private int minBin;
 	private int maxBin;
 	
@@ -36,11 +38,17 @@ public class DictionaryReader {
 		return maxBin;
 	}
 	
+	public int getZeros(){
+		return zeros;
+	}
+	
 	public void printDictionary(){
+		System.out.println("Zeros: " + zeros);
 		Iterator it = m.entrySet().iterator();
 		while(it.hasNext()){
 			Map.Entry pair = (Map.Entry) it.next();
-			System.out.println(pair.getKey() + " = " + pair.getValue());
+			Code x = (Code) pair.getKey();
+			System.out.println("Kod: " + x.code + " Length: " + x.length + " Symbol: " + pair.getValue());
 		}
 	}
 	
@@ -58,12 +66,12 @@ public class DictionaryReader {
 	}
 	
 	private void createMap(Reader buffer){
-		m = new HashMap<Integer, String>();
+		m = new HashMap<Code, String>();
 		int r;
 		STATE state = STATE.NOTHING;
 		StringBuilder builder = new StringBuilder();
 		String value = null;
-		Integer key = null;
+		Code key = null;
 		try {
 			while((r = buffer.read()) != -1)
 			{
@@ -72,14 +80,15 @@ public class DictionaryReader {
 				{
 				case NOTHING:
 					if(ch=='{') state = STATE.CHAR;
+					if(ch=='[') state = STATE.ZERO_NAME;
 					break;
 				case CODE:
-					if(ch!='}') builder.append(ch);
+					if(ch!='=') builder.append(ch);
 					else {
-						key = new Integer(builder.toString());
+						key = new Code();
+						key.code = Integer.parseInt(builder.toString());
 						builder.setLength(0);
-						state = STATE.NOTHING;
-						m.put(key, value);
+						state = STATE.LENGTH;
 					}
 					break;
 				case CHAR:
@@ -90,6 +99,25 @@ public class DictionaryReader {
 						state = STATE.CODE;
 					}
 					break;
+				case LENGTH:
+					if(ch!='}') builder.append(ch);
+					else {
+						key.length = Integer.parseInt(builder.toString());
+						builder.setLength(0);
+						state = STATE.NOTHING;
+						m.put(key, value);
+					}
+					break;
+				case ZERO_NAME:
+					if(ch == '=') state = STATE.ZEROS;
+					break;
+				case ZEROS:
+					if(ch!=']') builder.append(ch);
+					else {
+						zeros = Integer.parseInt(builder.toString());
+						builder.setLength(0);
+						state = STATE.NOTHING;
+					}
 				}
 			}
 		} catch (IOException e) {

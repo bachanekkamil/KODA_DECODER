@@ -5,26 +5,58 @@ import java.util.Map;
 public class Interpreter {
 	private String last;
 	Map dictionary;
+	int zeros;
+	StringBuilder sb = new StringBuilder();
 	
-	Interpreter(Map dic){
+	Interpreter(Map dic, int zeros){
 		this.dictionary = dic;
+		this.zeros = zeros;
 	}
 	
-	public void decode(byte[] bytes)
+	
+	public String decode(byte[] bytes)
 	{
+		System.out.println("Bytes szie: " + bytes.length);
+		System.out.println("Zeros: " + zeros);
 		int actual = 0;
+		int length = 0;
+		/*/
 		for(byte bajt : bytes){
+			ii++;
+			//System.out.println(ii);
 			for(int i=0 ; i<8 ; i++){
+				length++;
 				if(getBit(bajt, i))
 					actual = (actual << 1) + 1;
 				else
 					actual = actual << 1;
-				if(isCode(actual)){
+				if(isCode(actual, length)){
 					System.out.println(last);
 					actual = 0;
+					length = 0;
 				}
 			}	
 		}
+		/*/
+		int ommited = 0;
+		for(int z = bytes.length - 1 ; z >= 0 ; z--)
+		{	 
+				for(int i=7 ; i>=0 ; i--){
+					if(zeros <= ommited) {
+						length++;
+						if(getBit(bytes[z], i))
+							actual += Math.pow(2, length - 1);
+						if(isCode(actual, length)){
+							//System.out.print(last);
+							actual = 0;
+							length = 0;
+						}
+					}
+					ommited++;
+				}
+				System.out.println((bytes.length - z) + " / " + bytes.length);
+		}
+		return sb.toString();
 	}
 	
 	private boolean getBit(byte byt, int number)
@@ -67,9 +99,12 @@ public class Interpreter {
 		return false;
 	}
 	
-	private boolean isCode(int key){
-		if(dictionary.get(key) != null){
-			last = (String) dictionary.get(key);
+	private boolean isCode(int key, int length){
+		Code keyy = new Code();
+		keyy.code = key;
+		keyy.length = length;
+		if(dictionary.get(keyy) != null){
+			sb.insert(0, (String) dictionary.get(keyy));
 			return true;
 		}
 		
