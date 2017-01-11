@@ -8,11 +8,13 @@ public class Interpreter {
 	private int zeros;
 	private int minBinLength;
 	private StringBuilder sb = new StringBuilder();
+	private DictionaryReader.METHOD method;
 	
-	Interpreter(Map<Code, String> dic, int zeros, int min){
+	Interpreter(Map<Code, String> dic, int zeros, int min, DictionaryReader.METHOD method){
 		this.dictionary = dic;
 		this.zeros = zeros;
 		this.minBinLength = min;
+		this.method = method;
 	}
 	
 	public String decode(byte[] bytes)
@@ -20,6 +22,8 @@ public class Interpreter {
 		System.out.println("Bytes size: " + bytes.length);
 		System.out.println("Zeros: " + zeros);
 		System.out.println("MinBin: " + minBinLength);
+		System.out.println("Method: " + DictionaryReader.getNameOfMethod(method));
+		System.out.println("Decoding...");
 		int actual = 0;
 		int length = 0;
 
@@ -41,7 +45,7 @@ public class Interpreter {
 					}
 					ommited++;
 				}
-				System.out.println((bytes.length - z) + " / " + bytes.length);
+				//System.out.println((bytes.length - z) + " / " + bytes.length);
 		}
 		return sb.toString();
 	}
@@ -91,7 +95,11 @@ public class Interpreter {
 		keyy.code = key;
 		keyy.length = length;
 		if(dictionary.get(keyy) != null){
-			sb.insert(0, (String) dictionary.get(keyy));
+			if(method != DictionaryReader.METHOD.CONTEXT_CHARACTERS)
+				sb.insert(0, (String) dictionary.get(keyy));
+			else{
+				sb.insert(0, dictionary.get(keyy).charAt(0));
+			}
 			return true;
 		}
 		

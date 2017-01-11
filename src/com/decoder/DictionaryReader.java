@@ -16,10 +16,25 @@ import java.util.Map.Entry;
 
 public class DictionaryReader {
 	
-	private enum STATE {NOTHING, CODE, CHAR, LENGTH, ZERO_NAME, ZEROS};
+	private static final String METHOD_NAME_SINGLE_CHARACTER = "SingleCharacter";
+	private static final String METHOD_NAME_TWO_CHARACTERS = "TwoCharacters";
+	private static final String METHOD_NAME_CONTEXT_CHARACTERS = "ContextCharacter";
+	private enum STATE {NOTHING, CODE, CHAR, LENGTH, ZERO_NAME, ZEROS, METHOD_NAME};
+	public enum METHOD {UNKNOWN, SINGLE_CHARACTER, TWO_CHARACTERS, CONTEXT_CHARACTERS};
+	private METHOD method = METHOD.UNKNOWN;
 	private Map<Code, String> m;
 	private int zeros;
 	private int minBin = Integer.MAX_VALUE;
+	
+	public static final String getNameOfMethod(METHOD method) {
+		switch(method){
+			case SINGLE_CHARACTER : return METHOD_NAME_SINGLE_CHARACTER;
+			case TWO_CHARACTERS : return METHOD_NAME_TWO_CHARACTERS;
+			case CONTEXT_CHARACTERS : return METHOD_NAME_CONTEXT_CHARACTERS;
+			default : return "UNKNOWN_METHOD";
+		}
+		
+	}
 	
 	DictionaryReader(String filePath){
 		InputStream in = null;
@@ -74,6 +89,20 @@ public class DictionaryReader {
 		}
 	}
 	
+	private void setMethodName(String methodName) {
+		if(methodName.equals(METHOD_NAME_TWO_CHARACTERS))
+			method = METHOD.TWO_CHARACTERS;
+		else if(methodName.equals(METHOD_NAME_CONTEXT_CHARACTERS))
+			method = METHOD.CONTEXT_CHARACTERS;
+			else if(methodName.equals(METHOD_NAME_SINGLE_CHARACTER))
+				method = METHOD.SINGLE_CHARACTER;
+	}
+	
+	public METHOD getMethod()
+	{
+		return method;
+	}
+	
 	private void createMap(Reader buffer){
 		m = new HashMap<Code, String>();
 		int r;
@@ -89,7 +118,7 @@ public class DictionaryReader {
 				{
 				case NOTHING:
 					if(ch=='{') state = STATE.CHAR;
-					if(ch=='[') state = STATE.ZERO_NAME;
+					if(ch=='[') state = STATE.METHOD_NAME;
 					break;
 				case CODE:
 					if(ch!='=') builder.append(ch);
@@ -127,6 +156,16 @@ public class DictionaryReader {
 						builder.setLength(0);
 						state = STATE.NOTHING;
 					}
+					break;
+				case METHOD_NAME:
+					if(ch != ']') builder.append(ch);
+					else {
+						String method = builder.toString();
+						setMethodName(method);
+						builder.setLength(0);
+						state = STATE.ZERO_NAME;
+					}
+				
 				}
 			}
 		} catch (IOException e) {

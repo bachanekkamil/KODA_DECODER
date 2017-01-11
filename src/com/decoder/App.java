@@ -20,7 +20,7 @@ public class App {
 		DictionaryReader dictionaryReader = new DictionaryReader(dicFileName);
 		dictionaryReader.printDictionary();	
 		
-		Interpreter intepreter = new Interpreter(dictionaryReader.getMap(), dictionaryReader.getZeros(), dictionaryReader.getMinBin());
+		Interpreter intepreter = new Interpreter(dictionaryReader.getMap(), dictionaryReader.getZeros(), dictionaryReader.getMinBin(), dictionaryReader.getMethod());
 		
 		PrintWriter out = null;
 		try {
