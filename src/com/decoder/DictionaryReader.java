@@ -19,12 +19,19 @@ public class DictionaryReader {
 	private static final String METHOD_NAME_SINGLE_CHARACTER = "SingleCharacter";
 	private static final String METHOD_NAME_TWO_CHARACTERS = "TwoCharacters";
 	private static final String METHOD_NAME_CONTEXT_CHARACTERS = "ContextCharacter";
-	private enum STATE {NOTHING, CODE, CHAR, LENGTH, ZERO_NAME, ZEROS, METHOD_NAME};
+	private static final String TYPE_NAME_TEXT = "text";
+	private static final String TYPE_NAME_PHOTO = "image";
+	private enum STATE {NOTHING, CODE, CHAR, LENGTH, ZERO_NAME, ZEROS, METHOD_NAME, TYPE, TYPE_NAME};
 	public enum METHOD {UNKNOWN, SINGLE_CHARACTER, TWO_CHARACTERS, CONTEXT_CHARACTERS};
 	private METHOD method = METHOD.UNKNOWN;
 	private Map<Code, String> m;
 	private int zeros;
 	private int minBin = Integer.MAX_VALUE;
+	private boolean isPhoto = false;
+	
+	public boolean getIsPhoto() {
+		return isPhoto;
+	}
 	
 	public static final String getNameOfMethod(METHOD method) {
 		switch(method){
@@ -98,6 +105,13 @@ public class DictionaryReader {
 				method = METHOD.SINGLE_CHARACTER;
 	}
 	
+	private void setType(String typeName) {
+		if(typeName.equals(TYPE_NAME_TEXT))
+			isPhoto = false;
+		else if(typeName.equals(TYPE_NAME_PHOTO))
+			isPhoto = true;
+	}
+	
 	public METHOD getMethod()
 	{
 		return method;
@@ -110,6 +124,8 @@ public class DictionaryReader {
 		StringBuilder builder = new StringBuilder();
 		String value = null;
 		Code key = null;
+		int should_be_symbols = 1;
+		int symbols = 0;
 		try {
 			while((r = buffer.read()) != -1)
 			{
@@ -121,20 +137,28 @@ public class DictionaryReader {
 					if(ch=='[') state = STATE.METHOD_NAME;
 					break;
 				case CODE:
-					if(ch!='=') builder.append(ch);
+					if(ch!='=') {
+						builder.append(ch);
+						
+					}
 					else {
 						key = new Code();
 						key.code = Integer.parseInt(builder.toString());
 						builder.setLength(0);
 						state = STATE.LENGTH;
+						
 					}
 					break;
 				case CHAR:
-					if(ch!='=') builder.append(ch);
+					if(ch!='=' || symbols < should_be_symbols) {
+						builder.append(ch);
+						symbols++;;
+					}
 					else {
 						value = builder.toString();
 						builder.setLength(0);
 						state = STATE.CODE;
+						symbols=0;
 					}
 					break;
 				case LENGTH:
@@ -162,6 +186,20 @@ public class DictionaryReader {
 					else {
 						String method = builder.toString();
 						setMethodName(method);
+						if(this.method != METHOD.SINGLE_CHARACTER)
+							should_be_symbols = 2;
+						builder.setLength(0);
+						state = STATE.TYPE_NAME;
+					}
+					break;
+				case TYPE_NAME:
+					if(ch == '=') state = STATE.TYPE;
+					break;
+				case TYPE:
+					if(ch!=']') builder.append(ch);
+					else {
+						String method = builder.toString();
+						setType(method);
 						builder.setLength(0);
 						state = STATE.ZERO_NAME;
 					}

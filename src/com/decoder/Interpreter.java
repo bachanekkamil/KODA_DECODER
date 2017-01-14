@@ -1,5 +1,6 @@
 package com.decoder;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class Interpreter {
@@ -9,12 +10,14 @@ public class Interpreter {
 	private int minBinLength;
 	private StringBuilder sb = new StringBuilder();
 	private DictionaryReader.METHOD method;
+	private boolean isPhoto = false;
 	
-	Interpreter(Map<Code, String> dic, int zeros, int min, DictionaryReader.METHOD method){
+	Interpreter(Map<Code, String> dic, int zeros, int min, DictionaryReader.METHOD method, boolean isPhoto){
 		this.dictionary = dic;
 		this.zeros = zeros;
 		this.minBinLength = min;
 		this.method = method;
+		this.isPhoto = isPhoto;
 	}
 	
 	public String decode(byte[] bytes)
@@ -23,6 +26,7 @@ public class Interpreter {
 		System.out.println("Zeros: " + zeros);
 		System.out.println("MinBin: " + minBinLength);
 		System.out.println("Method: " + DictionaryReader.getNameOfMethod(method));
+		System.out.println("Photo: " + isPhoto);
 		System.out.println("Decoding...");
 		int actual = 0;
 		int length = 0;
@@ -47,7 +51,19 @@ public class Interpreter {
 				}
 				//System.out.println((bytes.length - z) + " / " + bytes.length);
 		}
+		if(sb.charAt(sb.length()-1) == ' ') sb.deleteCharAt(sb.length()-1);
 		return sb.toString();
+	}
+	
+	public byte[] decodePhoto(byte[] bytes) {
+		String text = decode(bytes);
+		byte[] output_bytes = new byte[text.length()];
+		char ch;
+		for(int i = 0 ; i < text.length() ; i++) {
+			ch = text.charAt(i);
+			output_bytes[i] = (byte) ch;
+		}
+		return output_bytes;
 	}
 	
 	private boolean getBit(byte byt, int number)
