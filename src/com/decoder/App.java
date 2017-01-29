@@ -12,10 +12,10 @@ public class App {
 
 	public static void main(String[] args) {
 		
-		String codeFileName = "/home/koda/gen-bin2";		
-		String dicFileName = "/home/koda/gen-bin2-dic";	
-		String outputFileName = "/home/koda/decoded";
-		String outputPhotoFileName = "/home/koda/decoded.png";
+		String codeFileName = args[0];		
+		String dicFileName = args[1];
+		//String outputFileName = "/home/koda/decoded";
+		//String outputPhotoFileName = "/home/koda/decoded.png";
 		
 		CodeReader codeReader = new CodeReader(codeFileName);
 		
@@ -27,7 +27,7 @@ public class App {
 		if(!dictionaryReader.getIsPhoto()) {
 			PrintWriter out = null;
 			try {
-				FileOutputStream fos = new FileOutputStream(outputFileName);
+				FileOutputStream fos = new FileOutputStream("decoded");
 				out = new PrintWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8), true);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -38,7 +38,7 @@ public class App {
 		else {
 			FileOutputStream fos;
 			try {
-				fos = new FileOutputStream(outputPhotoFileName);
+				fos = new FileOutputStream("decoded.png");
 				fos.write(intepreter.decodePhoto(codeReader.getBytes()));
 				fos.close();
 			} catch (IOException e) {
