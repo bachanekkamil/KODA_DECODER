@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Koda-decoder" default="makejar" basedir="."> 
+	
+	<property name="builddir" value="${basedir}/build"/>
+	<property name="classdir" value="${builddir}/classes"/>
+	<property name="jardir" value="${builddir}/jar/"/>
+
+	<property name="srcdir" value="${basedir}/src"/>
+
+	<property name="jarname" value="Decode.jar"/>	
+
+
+
+	<!-- ================================= 
+		          target: clean              
+		         ================================= -->             
+	<target name="clean" description="cleans build">
+		<delete dir="${builddir}"/>
+	</target>
+		
+	<!-- ================================= 
+		          target: compile              
+		         ================================= -->
+	<target name="compile" description="compiles classes">
+		<mkdir dir="${classdir}"/>
+		<javac srcdir="${srcdir}" destdir="${classdir}"/>
+	</target>
+		
+	<!-- ================================= 
+		          target: makejar              
+		         ================================= -->	
+	<target name="makejar" description="compile a jar" depends="compile">
+		<mkdir dir="${jardir}"/>
+		<jar destfile="${jardir}/${jarname}" basedir="${classdir}">
+			<manifest>
+				<attribute name="Main-Class" value="com.decoder.App"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<!-- ================================= 
+	          target: run              
+	         ================================= -->
+	<target name="run" depends="makejar" description="runs application">
+		<java fork="true" classname="com.decoder.App"> 
+			<classpath>
+				<path location="${jardir}/${jarname}"/>
+			</classpath>
+		</java>
+	</target>
+	
+		
+</project>
